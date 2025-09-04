@@ -72,13 +72,25 @@
             const streamDiv = document.createElement('div');
             streamDiv.className = 'stream';
             
-            // YouTube iframe'i oluştur (mertskaplan.com sitesindeki gibi)
+            // YouTube iframe'i oluştur - daha basit ve güvenilir parametrelerle
             const iframe = document.createElement('iframe');
-            iframe.src = `https://www.youtube-nocookie.com/embed/${channel.videoId}?autoplay=1&mute=1&rel=0&modestbranding=1&showinfo=0&fs=1&iv_load_policy=3`;
-            iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
+            
+            // YouTube embed URL'sini oluştururken nocookie yerine standart YouTube kullanalım
+            // ve parametreleri basitleştirelim
+            iframe.src = `https://www.youtube.com/embed/${channel.videoId}?autoplay=1&mute=1&rel=0`;
+            
+            // Allow özelliğini en geniş şekilde ayarlayalım
+            iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen";
             iframe.allowFullscreen = true;
             iframe.frameBorder = "0";
             iframe.className = "player";
+            
+            // Hata yakalama için onerror özelliği ekleyelim
+            iframe.onerror = function() {
+                console.error(`Error loading video: ${channel.videoId}`);
+                // Hata durumunda kanal ID'si yaklaşımını deneyelim
+                iframe.src = `https://www.youtube.com/embed/live_stream?channel=${channel.channelId || ''}&autoplay=1&mute=1`;
+            };
             
             streamDiv.appendChild(iframe);
             streamGrid.appendChild(streamDiv);
