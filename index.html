@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canlı Yayınlar</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0; /* Hiç boşluk olmasın */
+            width: 100%;
+        }
+        
+        .stream {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%;
+            background-color: #000;
+        }
+        
+        .player {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        @media screen and (min-width: 1920px) {
+            .grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="grid" id="streamGrid"></div>
+
+    <script>
+        // Yaygın Türk haber kanallarının canlı yayın video ID'leri
+        const channelEmbeds = [
+            { videoId: "ztmY_cCtUl0" }, // TRT Haber
+            { videoId: "dK96AZbCns0" }, // CNN Türk
+            { videoId: "6g_DvD8e2T0" }, // NTV
+            { videoId: "ZSWPj9szKb8" }, // Habertürk
+            { videoId: "pK9G84LnDwU" }, // A Haber
+            { videoId: "_PbNN7UfWww" }, // FOX TV
+            { videoId: "XihyuKSyUD0" }, // TV100
+            { videoId: "qnpfhjMhMKY" }, // NTV
+            { videoId: "RNVNlJSUFoE" }, //  HaberTurk
+            { videoId: "hHSmBJk6w0c" }, // Boolberg
+            { videoId: "6N8_r2uwLEc" }, // Halk TV
+            { videoId: "QBe-sOEgSGo" }, // Ulke tv
+            { videoId: "ehxg6OsTlNk" }, // trt haber
+            { videoId: "6BX-NUzBSp8" }, // Sözcü TV
+            { videoId: "75KbHoP9SYA" }, // Bloomberg HT
+            { videoId: "CV5Fooi8YJA" }  // TRT World
+        ];
+
+        const streamGrid = document.getElementById('streamGrid');
+        
+        // Kanalları grid'e ekle
+        channelEmbeds.forEach(channel => {
+            const streamDiv = document.createElement('div');
+            streamDiv.className = 'stream';
+            
+            // YouTube iframe'i oluştur - daha basit ve güvenilir parametrelerle
+            const iframe = document.createElement('iframe');
+            
+            // YouTube embed URL'sini oluştururken nocookie yerine standart YouTube kullanalım
+            // ve parametreleri basitleştirelim
+            iframe.src = `https://www.youtube.com/embed/${channel.videoId}?autoplay=1&mute=1&rel=0`;
+            
+            // Allow özelliğini en geniş şekilde ayarlayalım
+            iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen";
+            iframe.allowFullscreen = true;
+            iframe.frameBorder = "0";
+            iframe.className = "player";
+            
+            // Hata yakalama için onerror özelliği ekleyelim
+            iframe.onerror = function() {
+                console.error(`Error loading video: ${channel.videoId}`);
+                // Hata durumunda kanal ID'si yaklaşımını deneyelim
+                iframe.src = `https://www.youtube.com/embed/live_stream?channel=${channel.channelId || ''}&autoplay=1&mute=1`;
+            };
+            
+            streamDiv.appendChild(iframe);
+            streamGrid.appendChild(streamDiv);
+        });
+
+        // Ekran boyutunu kontrol et
+        function checkScreenSize() {
+            if (window.innerWidth >= 1920) {
+                streamGrid.style.gridTemplateColumns = 'repeat(4, 1fr)';
+            } else {
+                streamGrid.style.gridTemplateColumns = 'repeat(3, 1fr)';
+            }
+        }
+
+        window.addEventListener('load', checkScreenSize);
+        window.addEventListener('resize', checkScreenSize);
+    </script>
+</body>
+</html>
